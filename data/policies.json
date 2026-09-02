@@ -1,21 +1,24 @@
-{
-    "academic_standing": {
-        "minimum_cgpa": 2.0
+﻿{
+  "probation": {
+    "minimum_cgpa": 2.00,
+    "warning_message": "Academic Probation: Your CGPA is below 2.00. You must improve your grades to avoid academic dismissal.",
+    "good_standing_message": "Good Standing: CGPA meets the university standard."
+  },
+  "waiver_slabs": [
+    {
+      "min_cgpa": 3.90,
+      "waiver_percentage": 100,
+      "remarks": "Full Free Tuition Waiver (100%)"
     },
-
-    "probation": {
-        "undergraduate": {
-            "minimum_trimester_credits": 6,
-            "minimum_semester_credits": 9,
-            "maximum_probation_notices": 3
-        }
+    {
+      "min_cgpa": 3.80,
+      "waiver_percentage": 50,
+      "remarks": "Half Free Tuition Waiver (50%)"
     },
-
-    "degree": {
-        "minimum_final_cgpa": 2.0
-    },
-
-    "retake": {
-        "first_time_course_fee_waiver_percent": 50
+    {
+      "min_cgpa": 3.70,
+      "waiver_percentage": 25,
+      "remarks": "Quarter Free Tuition Waiver (25%)"
     }
+  ]
 }

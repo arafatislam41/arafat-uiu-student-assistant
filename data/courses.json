@@ -1,14 +1,52 @@
-{
-    "CSE1110": {
-        "title": "Introduction to Computer Systems",
-        "credit": 1,
-        "prerequisites": []
-    },
-    "CSE1111": {
-        "title": "Structured Programming Language",
-        "credit": 3,
-        "prerequisites": [
-            "CSE1110"
-        ]
-    }
+﻿{
+  "CSE 1111": {
+    "title": "Structured Programming Language",
+    "credits": 3.0,
+    "prerequisites": []
+  },
+  "CSE 1112": {
+    "title": "Structured Programming Language Laboratory",
+    "credits": 1.0,
+    "prerequisites": []
+  },
+  "MATH 1151": {
+    "title": "Fundamental Calculus",
+    "credits": 3.0,
+    "prerequisites": []
+  },
+  "CSE 1211": {
+    "title": "Discrete Mathematics",
+    "credits": 3.0,
+    "prerequisites": ["MATH 1151"]
+  },
+  "CSE 2213": {
+    "title": "Data Structures",
+    "credits": 3.0,
+    "prerequisites": ["CSE 1111"]
+  },
+  "CSE 2214": {
+    "title": "Data Structures Laboratory",
+    "credits": 1.0,
+    "prerequisites": ["CSE 1112"]
+  },
+  "CSE 2215": {
+    "title": "Algorithms",
+    "credits": 3.0,
+    "prerequisites": ["CSE 2213"]
+  },
+  "CSE 2216": {
+    "title": "Algorithms Laboratory",
+    "credits": 1.0,
+    "prerequisites": ["CSE 2214"]
+  },
+  "CSE 3521": {
+    "title": "Database Management Systems",
+    "credits": 3.0,
+    "prerequisites": ["CSE 2213"]
+  },
+  "CSE 3411": {
+    "title": "Operating Systems",
+    "credits": 3.0,
+    "prerequisites": ["CSE 2213"]
+  }
 }
