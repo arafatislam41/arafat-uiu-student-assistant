@@ -1,114 +1,108 @@
-﻿# UIU Student Assistant
+﻿# <div align="center">
 
-A command-line tool for UIU (United International University) students to calculate GPA, CGPA, plan target CGPA, simulate what-if scenarios, and estimate the impact of retaking courses.
+# 
 
-## Features
+# \# 🎓 UIU Student Assistant
 
-1. **Calculate GPA** — Enter courses (code, grade, credit) for a single semester and get the GPA.
-2. **Calculate CGPA** — Enter all courses/records across semesters and get the overall CGPA.
-3. **Target CGPA Planner** — Given current CGPA, completed credits, future credits, and a target CGPA, calculates the GPA required in future courses to hit the target, and whether it's mathematically reachable.
-4. **View Grade Scale** — Displays the full UIU grade scale (grade, grade point, marks range).
-5. **What-if Simulator** — Given a current CGPA/credits and a set of hypothetical future course grades, calculates the resulting new CGPA, with an optional target check.
-6. **Retake Impact Calculator** — Given a current CGPA/credits and one or more courses being retaken (old grade → new grade), calculates the new CGPA after the retake(s).
+# 
 
-## UIU Grade Scale
+# \*\*A modular, test-driven academic assistant \& CLI toolkit tailored for students of United International University (UIU).\*\*
 
-| Grade | Point | Marks   |
-|-------|-------|---------|
-| A     | 4.00  | 90-100  |
-| A-    | 3.67  | 86-89   |
-| B+    | 3.33  | 82-85   |
-| B     | 3.00  | 78-81   |
-| B-    | 2.67  | 74-77   |
-| C+    | 2.33  | 70-73   |
-| C     | 2.00  | 66-69   |
-| C-    | 1.67  | 62-65   |
-| D+    | 1.33  | 58-61   |
-| D     | 1.00  | 55-57   |
-| F     | 0.00  | 0-54    |
+# 
 
-## Project Structure
+# !\[Python Version](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python\&logoColor=white)
 
-\\\
-.
-├── data/
-│   └── grading.json       # Grade scale data (point + marks range per grade)
-├── src/
-│   ├── grades.py           # Grade validation, lookup, and info functions
-│   ├── cgpa.py              # CourseResult, GPA/CGPA/target CGPA calculations
-│   └── main.py              # CLI menu and all interactive menu functions
-├── tests/
-│   ├── test_grades.py
-│   ├── test_cgpa.py
-│   └── test_main.py
-└── README.md
-\\\
+# !\[Tests](https://img.shields.io/badge/Tests-39%20Passed-brightgreen?logo=pytest\&logoColor=white)
 
-## Requirements
+# !\[Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-blue)
 
-- Python 3.10+
-- pytest (for running tests)
+# !\[License](https://img.shields.io/badge/License-MIT-yellow)
 
-## Setup
+# 
 
-\\\powershell
-python -m venv .venv
-.venv\Scripts\activate
-pip install pytest
-\\\
+# </div>
 
-## Usage
+# 
 
-\\\powershell
-python src\main.py
-\\\
+# \---
 
-Then choose an option from the menu (0-6).
+# 
 
-## Running Tests
+# \## 📌 Overview
 
-\\\powershell
-python -m pytest -v
-\\\
+# 
 
-All 27 tests (grades, cgpa, and main menu functions) should pass.
+# \*\*UIU Student Assistant\*\* হলো একটি কমান্ড-লাইন ভিত্তিক অ্যাকাডেমিক ইঞ্জিন যা UIU-এর অফিশিয়াল গ্রেডিং সিস্টেম, কোর্স কারিকুলাম এবং ফিন্যান্সিয়াল/অ্যাকাডেমিক পলিসির সাথে সামঞ্জস্য রেখে তৈরি। এটি শিক্ষার্থীদের জিপিএ ক্যালকুলেশন, রিটেকের প্রভাব পরিমাপ, টার্গেট জিপিএ প্ল্যানিং, টিউশন ফি হিসাব এবং প্রি-রিকুইজিট যাচাইকরণে সহায়তা করে।
 
-## Example: What-if Simulator
+# 
 
-\\\
-Current CGPA: 1.85
-Current completed credits: 30
-How many future courses? 5
-... (enter 5 courses with grades and credits) ...
-Target CGPA (enter 0 to skip check): 2.00
-\\\
+# \---
 
-Output shows the scenario, future GPA, new CGPA, and whether the target was reached.
+# 
 
-## Example: Retake Impact Calculator
+# \## 🚀 Key Features
 
-\\\
-Current CGPA: 1.85
-Current total credits: 30
-How many courses are you retaking? 1
-Course code: CSE1111
-Credit: 3
-Old Grade: F
-New Grade: A
-\\\
+# 
 
-Output:
-\\\
-Old CGPA          : 1.85
-New CGPA          : 2.25
-Change            : +0.40 (improved)
-\\\
+# \* 🧮 \*\*GPA \& CGPA Engines:\*\* সিঙ্গেল ও মাল্টিপল ট্রাইমেস্টারের ক্রেডিট-ওয়েটেড জিপিএ/সিজিপিএ গণনা।
 
-## Roadmap
+# \* 🎯 \*\*Target CGPA Planner:\*\* কাঙ্ক্ষিত CGPA অর্জনে পরবর্তী ক্রেডিটে কত GPA প্রয়োজন এবং তা গাণিতিকভাবে সম্ভব কি না তা যাচাই।
 
-- Result history / saved records across semesters
-- Course planner (schedule future semesters against target CGPA)
+# \* 🔮 \*\*What-If Scenario Simulator:\*\* ভবিষ্যতের সম্ভাব্য কোর্স গ্রেড বসিয়ে সম্ভাব্য CGPA কেমন হতে পারে তার সিমুলেশন।
 
-## Author
+# \* 🔄 \*\*Retake Impact Calculator:\*\* পুরনো গ্রেড রিপ্লেস করে নতুন গ্রেড বসালে CGPA ঠিক কতটা বাড়বে বা কমবে তা প্রদর্শন।
 
-Md Arafat Islam — CSE, United International University (UIU)
+# \* 📚 \*\*Catalog \& Prerequisite Checker:\*\* কোর্স কোড (যেমন `CSE 2215`) দিলে স্বয়ংক্রিয়ভাবে টাইটেল ও ক্রেডিট ডিটেক্ট করা এবং পূর্ববর্তী কোর্সের ভিত্তিতে যোগ্যতা যাচাই।
+
+# \* ⚖️ \*\*Probation \& Merit Waiver Tracker:\*\* UIU-এর পলিসি অনুযায়ী অ্যাকাডেমিক স্ট্যান্ডিং (Good Standing / Academic Probation) এবং ২৫%, ৫০%, ১০০% টিউশন ফি ওয়েভার পর্যালোচনা।
+
+# \* 💰 \*\*Trimester Tuition Calculator:\*\* ক্রেডিট সংখ্যা, ওয়েভার ডিসকাউন্ট এবং ট্রাইমেস্টার ফি মিলিয়ে নিট প্রদেয় ফি হিসাব।
+
+# \* 📄 \*\*Summary Report Exporter:\*\* সম্পূর্ণ প্রোফাইল ও অ্যাকাডেমিক অবস্থা টেক্সট ফাইলে (`reports/report\_<student\_id>.txt`) এক্সপোর্ট করার সুবিধা।
+
+# \* 💾 \*\*Smart Profile Persistence:\*\* `data/profile.json`-এ শিক্ষার্থীর নাম, আইডি ও তথ্য সংরক্ষণ, যাতে বারবার একই ডেটা ইনপুট দিতে না হয়।
+
+# 
+
+# \---
+
+# 
+
+# \## 📊 UIU Official Grade Scale
+
+# 
+
+# | Grade | Grade Point | Marks Range (%) | Status | Earns Credit |
+
+# |:-----:|:-----------:|:---------------:|:------:|:------------:|
+
+# | \*\*A\*\*  | 4.00 | 90 – 100 | Pass | Yes |
+
+# | \*\*A-\*\* | 3.67 | 86 – 89  | Pass | Yes |
+
+# | \*\*B+\*\* | 3.33 | 82 – 85  | Pass | Yes |
+
+# | \*\*B\*\*  | 3.00 | 78 – 81  | Pass | Yes |
+
+# | \*\*B-\*\* | 2.67 | 74 – 77  | Pass | Yes |
+
+# | \*\*C+\*\* | 2.33 | 70 – 73  | Pass | Yes |
+
+# | \*\*C\*\*  | 2.00 | 66 – 69  | Pass | Yes |
+
+# | \*\*C-\*\* | 1.67 | 62 – 65  | Pass | Yes |
+
+# | \*\*D+\*\* | 1.33 | 58 – 61  | Pass | Yes |
+
+# | \*\*D\*\*  | 1.00 | 55 – 57  | Pass | Yes |
+
+# | \*\*F\*\*  | 0.00 | 00 – 54  | Fail | No  |
+
+# 
+
+# \---
+
+# 
+
+# \## 📁 Project Architecture
+
