@@ -1,0 +1,9 @@
+{
+    "BSCSE": {
+        "name": "B.Sc. in Computer Science and Engineering",
+        "department": "CSE",
+        "current_total_credits": 141.0,
+        "minimum_cgpa": 2.0,
+        "curriculum_effective": "Summer 2026"
+    }
+}

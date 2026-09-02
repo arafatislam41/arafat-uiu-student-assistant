@@ -1,0 +1,14 @@
+{
+    "CSE1110": {
+        "title": "Introduction to Computer Systems",
+        "credit": 1,
+        "prerequisites": []
+    },
+    "CSE1111": {
+        "title": "Structured Programming Language",
+        "credit": 3,
+        "prerequisites": [
+            "CSE1110"
+        ]
+    }
+}

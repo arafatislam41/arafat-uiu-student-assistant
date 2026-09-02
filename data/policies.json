@@ -1,0 +1,21 @@
+{
+    "academic_standing": {
+        "minimum_cgpa": 2.0
+    },
+
+    "probation": {
+        "undergraduate": {
+            "minimum_trimester_credits": 6,
+            "minimum_semester_credits": 9,
+            "maximum_probation_notices": 3
+        }
+    },
+
+    "degree": {
+        "minimum_final_cgpa": 2.0
+    },
+
+    "retake": {
+        "first_time_course_fee_waiver_percent": 50
+    }
+}

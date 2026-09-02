@@ -1,0 +1,14 @@
+{
+    "BSCSE": {
+        "term_type": "trimester",
+        "fee_per_credit": null,
+        "trimester_fee": 6500,
+        "initial_partial_payment": 20000,
+        "installments": [
+            40,
+            30,
+            30
+        ],
+        "retake_first_time_fee_waiver_percent": 50
+    }
+}
