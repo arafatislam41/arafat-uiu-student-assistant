@@ -1,12 +1,52 @@
 ﻿{
-  "CSE": {
-    "total_credits_required": 140.0,
-    "categories": {
-      "University Core (GED)": 15.0,
-      "Basic Science & Math": 21.0,
-      "Core Engineering": 78.0,
-      "Electives & Tracks": 20.0,
-      "Final Project / Thesis": 6.0
+  "departments": {
+    "CSE": {
+      "name": "B.Sc. in Computer Science & Engineering",
+      "faculty": "School of Science & Engineering",
+      "total_credits": 140.0,
+      "cost_per_credit": 6500.0
+    },
+    "BBA": {
+      "name": "Bachelor of Business Administration",
+      "faculty": "School of Business & Economics",
+      "total_credits": 126.0,
+      "cost_per_credit": 6200.0
+    },
+    "EEE": {
+      "name": "B.Sc. in Electrical & Electronic Engineering",
+      "faculty": "School of Science & Engineering",
+      "total_credits": 140.0,
+      "cost_per_credit": 6500.0
+    },
+    "CE": {
+      "name": "B.Sc. in Civil Engineering",
+      "faculty": "School of Science & Engineering",
+      "total_credits": 144.0,
+      "cost_per_credit": 6500.0
+    },
+    "BSECO": {
+      "name": "BSS in Economics",
+      "faculty": "School of Business & Economics",
+      "total_credits": 120.0,
+      "cost_per_credit": 5500.0
+    },
+    "DS": {
+      "name": "B.Sc. in Data Science",
+      "faculty": "School of Science & Engineering",
+      "total_credits": 140.0,
+      "cost_per_credit": 6500.0
+    },
+    "ENG": {
+      "name": "BA in English",
+      "faculty": "School of Humanities & Social Sciences",
+      "total_credits": 123.0,
+      "cost_per_credit": 5000.0
+    },
+    "MSJ": {
+      "name": "BSS in Media Studies & Journalism",
+      "faculty": "School of Humanities & Social Sciences",
+      "total_credits": 123.0,
+      "cost_per_credit": 5200.0
     }
   },
   "installments": {

@@ -1,23 +1,45 @@
 ﻿import json
-from pathlib import Path
+import re
 from grades import get_marks_range
+from config import get_data_dir
 
-PROGRAMS_FILE = Path(__file__).resolve().parent.parent / "data" / "programs.json"
+PROGRAMS_FILE = get_data_dir() / "programs.json"
+
+
+def _load_programs():
+    if not PROGRAMS_FILE.exists():
+        return {}
+    with open(PROGRAMS_FILE, "r", encoding="utf-8-sig") as f:
+        return json.load(f)
+
+
+def get_available_departments() -> list[str]:
+    data = _load_programs()
+    return list(data.get("departments", {}).keys())
+
+
+def get_department_info(dept_code: str) -> dict:
+    data = _load_programs()
+    depts = data.get("departments", {})
+    return depts.get(dept_code.upper(), {
+        "name": f"Department of {dept_code}",
+        "faculty": "General Program",
+        "total_credits": 130.0,
+        "cost_per_credit": 6500.0
+    })
 
 
 def check_degree_progress(completed_credits: float, program: str = "CSE") -> dict:
-    if not PROGRAMS_FILE.exists():
-        total_req = 140.0
-    else:
-        with open(PROGRAMS_FILE, "r", encoding="utf-8-sig") as f:
-            data = json.load(f)
-            total_req = data.get(program, {}).get("total_credits_required", 140.0)
+    info = get_department_info(program)
+    total_req = float(info.get("total_credits", 140.0))
 
     remaining = max(0.0, total_req - completed_credits)
     progress_pct = min(100.0, (completed_credits / total_req) * 100) if total_req > 0 else 0.0
 
     return {
-        "program": program,
+        "program_code": program.upper(),
+        "program_name": info.get("name", program),
+        "faculty": info.get("faculty", ""),
         "total_required": total_req,
         "completed": completed_credits,
         "remaining": remaining,
@@ -27,10 +49,11 @@ def check_degree_progress(completed_credits: float, program: str = "CSE") -> dic
 
 
 def calculate_final_exam_target(attendance: float, quiz_assignment: float, midterm: float, target_grade: str) -> dict:
-    # Standard UIU Distribution: Attendance (5), Quiz/Assign (25), Midterm (30), Final (40)
     current_obtained = attendance + quiz_assignment + midterm
-    marks_range_str = get_marks_range(target_grade)
-    min_required_total = float(marks_range_str.split("-")[0])
+    marks_range_str = str(get_marks_range(target_grade)).strip()
+
+    numbers = re.findall(r"\d+", marks_range_str)
+    min_required_total = float(numbers[0]) if numbers else 80.0
 
     needed_in_final = min_required_total - current_obtained
 

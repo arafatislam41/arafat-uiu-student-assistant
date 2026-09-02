@@ -1,8 +1,8 @@
 ﻿import json
-from pathlib import Path
+from config import get_data_dir
 
-FEES_FILE = Path(__file__).resolve().parent.parent / "data" / "fees.json"
-PROGRAMS_FILE = Path(__file__).resolve().parent.parent / "data" / "programs.json"
+FEES_FILE = get_data_dir() / "fees.json"
+PROGRAMS_FILE = get_data_dir() / "programs.json"
 
 
 def _load_json(file_path):
@@ -12,9 +12,14 @@ def _load_json(file_path):
         return json.load(f)
 
 
-def calculate_tuition(credits: float, waiver_percentage: float = 0.0) -> dict:
+def calculate_tuition(credits: float, waiver_percentage: float = 0.0, department: str = "CSE") -> dict:
+    programs = _load_json(PROGRAMS_FILE)
+    dept_info = programs.get("departments", {}).get(department.upper(), {})
+    
+    # Department specific credit rate or fallback
+    cost_per_credit = float(dept_info.get("cost_per_credit", 6500.0))
+    
     fees = _load_json(FEES_FILE)
-    cost_per_credit = fees.get("cost_per_credit", 6500.0)
     trimester_fee = fees.get("trimester_fee", 6000.0)
 
     gross_tuition = credits * cost_per_credit
@@ -23,6 +28,7 @@ def calculate_tuition(credits: float, waiver_percentage: float = 0.0) -> dict:
     total_payable = net_tuition + trimester_fee
 
     return {
+        "department": department.upper(),
         "credits": credits,
         "cost_per_credit": cost_per_credit,
         "gross_tuition": gross_tuition,

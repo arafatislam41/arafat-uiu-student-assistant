@@ -1,43 +1,54 @@
 ﻿import json
-from pathlib import Path
+from config import get_data_dir
 
-DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "policies.json"
+POLICIES_FILE = get_data_dir() / "policies.json"
 
 
 def _load_policies():
-    if not DATA_FILE.exists():
+    if not POLICIES_FILE.exists():
         return {}
-    with open(DATA_FILE, "r", encoding="utf-8-sig") as f:
+    with open(POLICIES_FILE, "r", encoding="utf-8-sig") as f:
         return json.load(f)
 
 
-POLICIES = _load_policies()
-
-
 def check_probation_status(cgpa: float) -> dict:
-    probation_cfg = POLICIES.get("probation", {})
-    min_cgpa = probation_cfg.get("minimum_cgpa", 2.00)
-    is_on_probation = cgpa < min_cgpa
-
+    policies = _load_policies()
+    limit = policies.get("probation_limit", 2.00)
+    is_probation = cgpa < limit
     return {
-        "is_on_probation": is_on_probation,
-        "cgpa": cgpa,
-        "status": "ON PROBATION" if is_on_probation else "GOOD STANDING",
-        "message": probation_cfg.get("warning_message") if is_on_probation else probation_cfg.get("good_standing_message")
+        "is_on_probation": is_probation,
+        "status": "ON PROBATION" if is_probation else "GOOD STANDING",
+        "message": (
+            f"Your CGPA is below {limit:.2f}. You are currently on academic probation."
+            if is_probation
+            else "Your academic standing is good."
+        ),
     }
 
 
 def check_waiver_eligibility(cgpa: float) -> dict:
-    slabs = POLICIES.get("waiver_slabs", [])
-    for slab in slabs:
-        if cgpa >= slab["min_cgpa"]:
+    policies = _load_policies()
+    waivers = policies.get("merit_waiver_slabs", [])
+
+    if not waivers:
+        # Standard fallback slabs: 3.90+ -> 100%, 3.80+ -> 50%, 3.70+ -> 25%
+        waivers = [
+            {"min_cgpa": 3.90, "waiver_percentage": 100, "remarks": "100% Merit Waiver"},
+            {"min_cgpa": 3.80, "waiver_percentage": 50, "remarks": "50% Merit Waiver"},
+            {"min_cgpa": 3.70, "waiver_percentage": 25, "remarks": "25% Merit Waiver"}
+        ]
+
+    for w in sorted(waivers, key=lambda x: x.get("min_cgpa", x.get("min_gpa", 0.0)), reverse=True):
+        min_score = w.get("min_cgpa", w.get("min_gpa", 0.0))
+        if cgpa >= min_score:
             return {
                 "eligible": True,
-                "percentage": slab["waiver_percentage"],
-                "remarks": slab["remarks"]
+                "percentage": w.get("waiver_percentage", 0),
+                "remarks": w.get("remarks", "Merit Waiver"),
             }
+
     return {
         "eligible": False,
         "percentage": 0,
-        "remarks": "No merit waiver applicable (Requires CGPA >= 3.70)"
+        "remarks": "Not eligible for merit waiver.",
     }

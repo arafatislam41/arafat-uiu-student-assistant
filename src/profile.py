@@ -1,35 +1,45 @@
 ﻿import json
-from pathlib import Path
+from config import get_user_data_dir
 
-PROFILE_FILE = Path(__file__).resolve().parent.parent / "data" / "profile.json"
+PROFILE_FILE = get_user_data_dir() / "profile.json"
 
-def load_profile():
-    """Load the user profile from JSON."""
+DEFAULT_GUEST_PROFILE = {
+    "name": "Guest Student",
+    "student_id": "Not Set",
+    "department": "CSE",
+    "current_cgpa": 0.00,
+    "completed_credits": 0.0,
+    "is_first_run": True
+}
+
+def get_profile() -> dict:
     if not PROFILE_FILE.exists():
-        return {
-            "name": "Guest",
-            "student_id": "N/A",
-            "current_cgpa": 0.0,
-            "completed_credits": 0.0,
-            "history": []
-        }
-    with open(PROFILE_FILE, "r", encoding="utf-8-sig") as file:
-        return json.load(file)
+        return DEFAULT_GUEST_PROFILE.copy()
+    try:
+        with open(PROFILE_FILE, "r", encoding="utf-8-sig") as f:
+            data = json.load(f)
+            # Ensure all keys exist
+            merged = DEFAULT_GUEST_PROFILE.copy()
+            merged.update(data)
+            return merged
+    except Exception:
+        return DEFAULT_GUEST_PROFILE.copy()
 
-def save_profile(data):
-    """Save the user profile to JSON."""
-    PROFILE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(PROFILE_FILE, "w", encoding="utf-8-sig") as file:
-        json.dump(data, file, indent=4)
+def update_profile(name=None, student_id=None, department=None, cgpa=None, credits=None, is_first_run=None):
+    prof = get_profile()
+    if name is not None: prof["name"] = name.strip()
+    if student_id is not None: prof["student_id"] = student_id.strip()
+    if department is not None: prof["department"] = department.strip().upper()
+    if cgpa is not None: prof["current_cgpa"] = float(cgpa)
+    if credits is not None: prof["completed_credits"] = float(credits)
+    if is_first_run is not None: prof["is_first_run"] = bool(is_first_run)
 
-def get_profile():
-    return load_profile()
+    with open(PROFILE_FILE, "w", encoding="utf-8") as f:
+        json.dump(prof, f, indent=2)
+    return prof
 
-def update_profile(name=None, student_id=None, cgpa=None, credits=None):
-    profile = load_profile()
-    if name is not None: profile["name"] = name
-    if student_id is not None: profile["student_id"] = student_id
-    if cgpa is not None: profile["current_cgpa"] = float(cgpa)
-    if credits is not None: profile["completed_credits"] = float(credits)
-    save_profile(profile)
-
+def reset_to_guest():
+    """Resets user configuration back to guest defaults."""
+    with open(PROFILE_FILE, "w", encoding="utf-8") as f:
+        json.dump(DEFAULT_GUEST_PROFILE, f, indent=2)
+    return DEFAULT_GUEST_PROFILE.copy()
