@@ -9,8 +9,10 @@ from cgpa import (
 from profile import get_profile, update_profile
 from courses import get_course_info, normalize_code, list_courses, check_prerequisites
 from probation import check_probation_status, check_waiver_eligibility
-from tuition import calculate_tuition
+from tuition import calculate_tuition, calculate_installments
 from reports import generate_student_report
+from graduation import check_degree_progress, calculate_final_exam_target
+from gui import launch_gui
 
 
 def print_header(title):
@@ -284,7 +286,7 @@ def waiver_probation_menu():
 
 
 def tuition_calculator_menu():
-    print_header("TRIMESTER TUITION FEE CALCULATOR")
+    print_header("TRIMESTER TUITION & 3-INSTALLMENT BREAKDOWN")
     profile = get_profile()
     waiver_info = check_waiver_eligibility(profile["current_cgpa"])
 
@@ -292,6 +294,7 @@ def tuition_calculator_menu():
     waiver_pct = input_number("Waiver percentage to apply", minimum=0, default=waiver_info["percentage"])
 
     calc = calculate_tuition(credits, waiver_pct)
+    installments = calculate_installments(calc["total_payable"])
 
     print()
     print("-" * 60)
@@ -302,6 +305,56 @@ def tuition_calculator_menu():
     print(f"{'Trimester Activity Fee':<22}: +{calc['trimester_fee']:,.2f} BDT")
     print("-" * 60)
     print(f"{'TOTAL PAYABLE':<22}: {calc['total_payable']:,.2f} BDT")
+    print("-" * 60)
+    print("\nUIU 3-Installment Schedule:")
+    print("-" * 60)
+    for inst in installments:
+        print(f"Installment {inst['installment_no']} ({inst['percentage']}%) : {inst['amount']:,.2f} BDT  [{inst['deadline']}]")
+    print("-" * 60)
+
+
+def degree_audit_menu():
+    print_header("CSE DEGREE AUDIT TRACKER")
+    profile = get_profile()
+    completed = input_number("Completed Credits so far", minimum=0, default=profile["completed_credits"])
+
+    audit = check_degree_progress(completed, "CSE")
+    print(f"Degree Program     : {audit['program']}")
+    print(f"Total Required     : {audit['total_required']:.1f} Credits")
+    print(f"Completed          : {audit['completed']:.1f} Credits")
+    print(f"Remaining          : {audit['remaining']:.1f} Credits")
+    print(f"Degree Progress    : {audit['progress_percentage']:.1f}% Completed")
+    print("-" * 60)
+    if audit['is_graduated']:
+        print("CONGRATULATIONS! You have completed the credit requirements for graduation!")
+    else:
+        est_trimesters = round(audit['remaining'] / 12.0, 1)
+        print(f"Estimated Remaining Trimesters (at 12 cr/trimester): ~{est_trimesters} trimesters")
+    print("-" * 60)
+
+
+def exam_marks_target_menu():
+    print_header("FINAL EXAM TARGET CALCULATOR")
+    print("Standard UIU Distribution: Attendance (5) + Quiz/Assignment (25) + Midterm (30) = 60 marks")
+    print("Final Exam = 40 marks | Total = 100 marks\n")
+
+    att = input_number("Attendance marks obtained (out of 5)", minimum=0)
+    quiz = input_number("Quiz / Assignment marks obtained (out of 25)", minimum=0)
+    mid = input_number("Midterm marks obtained (out of 30)", minimum=0)
+    target = input_grade("Desired Course Grade (e.g., A, A-, B+): ")
+
+    res = calculate_final_exam_target(att, quiz, mid, target)
+    print()
+    print("-" * 60)
+    print(f"Current Continuous Total : {res['current_total']:.1f} / 60.0")
+    print(f"Target Grade Threshold   : {res['target_grade']} (Minimum {res['min_total_required']} marks)")
+    print("-" * 60)
+    if res["is_achievable"]:
+        print(f"STATUS: ACHIEVABLE! ✅")
+        print(f"Marks needed in Final Exam: {res['needed_in_final']:.1f} / 40.0")
+    else:
+        print(f"STATUS: UNFORTUNATELY NOT ACHIEVABLE ❌")
+        print(f"Reason: {res['reason']}")
     print("-" * 60)
 
 
@@ -366,9 +419,12 @@ def main():
         print("6.  Retake Impact Calculator")
         print("7.  Browse Courses & Prerequisites")
         print("8.  Academic Standing & Waiver Checker")
-        print("9.  Trimester Tuition Fee Calculator")
-        print("10. Export Academic Summary Report")
-        print("11. Manage Profile")
+        print("9.  Trimester Tuition & 3-Installment Breakdown")
+        print("10. CSE Degree Audit Tracker (140 Credits)")
+        print("11. Final Exam Target Calculator")
+        print("12. Export Academic Summary Report")
+        print("13. Manage Profile")
+        print("14. Launch Modern Desktop GUI")
         print("0.  Exit")
         print()
 
@@ -383,13 +439,16 @@ def main():
             elif choice == "7": browse_courses_menu()
             elif choice == "8": waiver_probation_menu()
             elif choice == "9": tuition_calculator_menu()
-            elif choice == "10": export_report_menu()
-            elif choice == "11": manage_profile_menu()
+            elif choice == "10": degree_audit_menu()
+            elif choice == "11": exam_marks_target_menu()
+            elif choice == "12": export_report_menu()
+            elif choice == "13": manage_profile_menu()
+            elif choice == "14": launch_gui()
             elif choice == "0":
                 print("\nThank you for using UIU Student Assistant.")
                 break
             else:
-                print("\nInvalid option. Please select 0-11.")
+                print("\nInvalid option. Please select 0-14.")
         except Exception as error:
             print(f"\nError: {error}")
 

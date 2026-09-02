@@ -1,9 +1,20 @@
-{
-    "BSCSE": {
-        "name": "B.Sc. in Computer Science and Engineering",
-        "department": "CSE",
-        "current_total_credits": 141.0,
-        "minimum_cgpa": 2.0,
-        "curriculum_effective": "Summer 2026"
+﻿{
+  "CSE": {
+    "total_credits_required": 140.0,
+    "categories": {
+      "University Core (GED)": 15.0,
+      "Basic Science & Math": 21.0,
+      "Core Engineering": 78.0,
+      "Electives & Tracks": 20.0,
+      "Final Project / Thesis": 6.0
     }
+  },
+  "installments": {
+    "installment_1_ratio": 0.40,
+    "installment_2_ratio": 0.30,
+    "installment_3_ratio": 0.30,
+    "installment_1_note": "Due at Registration / First 2 weeks",
+    "installment_2_note": "Due before Midterm Exam",
+    "installment_3_note": "Due before Final Exam"
+  }
 }
