@@ -19,7 +19,6 @@ def test_course_lookup():
 
 
 def test_prerequisites_satisfied():
-    # Algorithms (CSE 2215) requires Data Structures (CSE 2213)
     result = check_prerequisites("CSE 2215", ["CSE 2213"])
     assert result["can_take"] is True
     assert len(result["missing"]) == 0

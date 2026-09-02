@@ -9,6 +9,8 @@ from cgpa import (
 from profile import get_profile, update_profile
 from courses import get_course_info, normalize_code, list_courses, check_prerequisites
 from probation import check_probation_status, check_waiver_eligibility
+from tuition import calculate_tuition
+from reports import generate_student_report
 
 
 def print_header(title):
@@ -91,72 +93,6 @@ def input_retake():
         "old_grade": old_grade,
         "new_grade": new_grade,
     }
-
-
-def manage_profile_menu():
-    print_header("MANAGE PROFILE")
-    profile = get_profile()
-
-    print(f"Current Name: {profile['name']}")
-    name = input("Enter new name (leave empty to keep current): ").strip()
-
-    print(f"Current ID: {profile['student_id']}")
-    student_id = input("Enter new ID (leave empty to keep current): ").strip()
-
-    print(f"Current CGPA: {profile['current_cgpa']}")
-    cgpa_str = input("Enter new CGPA (leave empty to keep current): ").strip()
-    cgpa = float(cgpa_str) if cgpa_str else None
-
-    print(f"Current Credits: {profile['completed_credits']}")
-    credits_str = input("Enter completed credits (leave empty to keep current): ").strip()
-    credits = float(credits_str) if credits_str else None
-
-    update_profile(
-        name=name if name else None,
-        student_id=student_id if student_id else None,
-        cgpa=cgpa,
-        credits=credits,
-    )
-    print("\nProfile updated successfully!")
-
-
-def browse_courses_menu():
-    print_header("UIU CSE COURSE CATALOG & PREREQUISITES")
-    catalog = list_courses()
-    print(f"{'Code':<12}{'Credits':<10}{'Title':<35}{'Prerequisites'}")
-    print("-" * 75)
-    for code, info in catalog.items():
-        prereqs = ", ".join(info["prerequisites"]) if info["prerequisites"] else "None"
-        print(f"{code:<12}{info['credits']:<10.1f}{info['title']:<35}{prereqs}")
-
-    print("\nCheck Prerequisite Eligibility:")
-    test_code = input("Enter course code to test (or press Enter to skip): ").strip()
-    if test_code:
-        completed = input("Enter completed courses (comma separated, e.g., CSE1111, CSE2213): ").split(",")
-        completed = [c.strip() for c in completed if c.strip()]
-        result = check_prerequisites(test_code, completed)
-        if result["can_take"]:
-            print(f"ELIGIBLE! All prerequisites satisfied for {normalize_code(test_code)}.")
-        else:
-            print(f"INELIGIBLE! Missing prerequisites: {', '.join(result['missing'])}")
-
-
-def waiver_probation_menu():
-    print_header("ACADEMIC STANDING & WAIVER CHECKER")
-    profile = get_profile()
-    cgpa = input_number("Enter CGPA to evaluate", minimum=0, default=profile["current_cgpa"])
-
-    probation_info = check_probation_status(cgpa)
-    waiver_info = check_waiver_eligibility(cgpa)
-
-    print()
-    print("-" * 60)
-    print(f"Academic Standing : {probation_info['status']}")
-    print(f"Remarks           : {probation_info['message']}")
-    print("-" * 60)
-    print(f"Tuition Waiver    : {waiver_info['percentage']}%")
-    print(f"Waiver Details    : {waiver_info['remarks']}")
-    print("-" * 60)
 
 
 def calculate_gpa_menu():
@@ -308,6 +244,105 @@ def retake_impact_menu():
     print("-" * 60)
 
 
+def browse_courses_menu():
+    print_header("UIU CSE COURSE CATALOG & PREREQUISITES")
+    catalog = list_courses()
+    print(f"{'Code':<12}{'Credits':<10}{'Title':<35}{'Prerequisites'}")
+    print("-" * 75)
+    for code, info in catalog.items():
+        prereqs = ", ".join(info["prerequisites"]) if info["prerequisites"] else "None"
+        print(f"{code:<12}{info['credits']:<10.1f}{info['title']:<35}{prereqs}")
+
+    print("\nCheck Prerequisite Eligibility:")
+    test_code = input("Enter course code to test (or press Enter to skip): ").strip()
+    if test_code:
+        completed = input("Enter completed courses (comma separated, e.g., CSE1111, CSE2213): ").split(",")
+        completed = [c.strip() for c in completed if c.strip()]
+        result = check_prerequisites(test_code, completed)
+        if result["can_take"]:
+            print(f"ELIGIBLE! All prerequisites satisfied for {normalize_code(test_code)}.")
+        else:
+            print(f"INELIGIBLE! Missing prerequisites: {', '.join(result['missing'])}")
+
+
+def waiver_probation_menu():
+    print_header("ACADEMIC STANDING & WAIVER CHECKER")
+    profile = get_profile()
+    cgpa = input_number("Enter CGPA to evaluate", minimum=0, default=profile["current_cgpa"])
+
+    probation_info = check_probation_status(cgpa)
+    waiver_info = check_waiver_eligibility(cgpa)
+
+    print()
+    print("-" * 60)
+    print(f"Academic Standing : {probation_info['status']}")
+    print(f"Remarks           : {probation_info['message']}")
+    print("-" * 60)
+    print(f"Tuition Waiver    : {waiver_info['percentage']}%")
+    print(f"Waiver Details    : {waiver_info['remarks']}")
+    print("-" * 60)
+
+
+def tuition_calculator_menu():
+    print_header("TRIMESTER TUITION FEE CALCULATOR")
+    profile = get_profile()
+    waiver_info = check_waiver_eligibility(profile["current_cgpa"])
+
+    credits = input_number("Credits taking this trimester", minimum=0.5)
+    waiver_pct = input_number("Waiver percentage to apply", minimum=0, default=waiver_info["percentage"])
+
+    calc = calculate_tuition(credits, waiver_pct)
+
+    print()
+    print("-" * 60)
+    print(f"{'Credits':<22}: {calc['credits']:.1f}")
+    print(f"{'Rate Per Credit':<22}: {calc['cost_per_credit']:,.2f} BDT")
+    print(f"{'Gross Tuition':<22}: {calc['gross_tuition']:,.2f} BDT")
+    print(f"{'Waiver Discount (' + str(int(calc['waiver_percentage'])) + '%)':<22}: -{calc['discount']:,.2f} BDT")
+    print(f"{'Trimester Activity Fee':<22}: +{calc['trimester_fee']:,.2f} BDT")
+    print("-" * 60)
+    print(f"{'TOTAL PAYABLE':<22}: {calc['total_payable']:,.2f} BDT")
+    print("-" * 60)
+
+
+def export_report_menu():
+    print_header("EXPORT ACADEMIC SUMMARY REPORT")
+    profile = get_profile()
+    probation_info = check_probation_status(profile["current_cgpa"])
+    waiver_info = check_waiver_eligibility(profile["current_cgpa"])
+
+    report_path = generate_student_report(profile, probation_info, waiver_info)
+    print(f"Report exported successfully!")
+    print(f"File Path: {report_path}")
+
+
+def manage_profile_menu():
+    print_header("MANAGE PROFILE")
+    profile = get_profile()
+
+    print(f"Current Name: {profile['name']}")
+    name = input("Enter new name (leave empty to keep current): ").strip()
+
+    print(f"Current ID: {profile['student_id']}")
+    student_id = input("Enter new ID (leave empty to keep current): ").strip()
+
+    print(f"Current CGPA: {profile['current_cgpa']}")
+    cgpa_str = input("Enter new CGPA (leave empty to keep current): ").strip()
+    cgpa = float(cgpa_str) if cgpa_str else None
+
+    print(f"Current Credits: {profile['completed_credits']}")
+    credits_str = input("Enter completed credits (leave empty to keep current): ").strip()
+    credits = float(credits_str) if credits_str else None
+
+    update_profile(
+        name=name if name else None,
+        student_id=student_id if student_id else None,
+        cgpa=cgpa,
+        credits=credits,
+    )
+    print("\nProfile updated successfully!")
+
+
 def show_grade_scale():
     print_header("UIU GRADE SCALE")
     print(f"{'Grade':<8}{'Point':<10}{'Marks'}")
@@ -323,16 +358,18 @@ def main():
         profile = get_profile()
         print_header(f"UIU STUDENT ASSISTANT — Welcome, {profile['name']}!")
 
-        print("1. Calculate GPA")
-        print("2. Calculate CGPA")
-        print("3. Target CGPA Planner")
-        print("4. View Grade Scale")
-        print("5. What-if Simulator")
-        print("6. Retake Impact Calculator")
-        print("7. Browse Courses & Prerequisites")
-        print("8. Academic Standing & Waiver Checker")
-        print("9. Manage Profile")
-        print("0. Exit")
+        print("1.  Calculate GPA")
+        print("2.  Calculate CGPA")
+        print("3.  Target CGPA Planner")
+        print("4.  View Grade Scale")
+        print("5.  What-if Simulator")
+        print("6.  Retake Impact Calculator")
+        print("7.  Browse Courses & Prerequisites")
+        print("8.  Academic Standing & Waiver Checker")
+        print("9.  Trimester Tuition Fee Calculator")
+        print("10. Export Academic Summary Report")
+        print("11. Manage Profile")
+        print("0.  Exit")
         print()
 
         choice = input("Select an option: ").strip()
@@ -345,12 +382,14 @@ def main():
             elif choice == "6": retake_impact_menu()
             elif choice == "7": browse_courses_menu()
             elif choice == "8": waiver_probation_menu()
-            elif choice == "9": manage_profile_menu()
+            elif choice == "9": tuition_calculator_menu()
+            elif choice == "10": export_report_menu()
+            elif choice == "11": manage_profile_menu()
             elif choice == "0":
                 print("\nThank you for using UIU Student Assistant.")
                 break
             else:
-                print("\nInvalid option. Please select 0-9.")
+                print("\nInvalid option. Please select 0-11.")
         except Exception as error:
             print(f"\nError: {error}")
 
