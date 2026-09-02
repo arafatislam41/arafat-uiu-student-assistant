@@ -12,6 +12,7 @@ from probation import check_probation_status, check_waiver_eligibility
 from tuition import calculate_tuition, calculate_installments
 from reports import generate_student_report
 from graduation import check_degree_progress, calculate_final_exam_target
+from transport import get_all_routes, find_routes_by_stop
 from gui import launch_gui
 
 
@@ -358,6 +359,26 @@ def exam_marks_target_menu():
     print("-" * 60)
 
 
+def bus_routes_menu():
+    print_header("UIU CAMPUS BUS & SHUTTLE ROUTES")
+    routes = get_all_routes()
+    for r in routes:
+        print(f"\n🚌 {r['route_name']}")
+        print(f"   Stops    : {' ➔ '.join(r['pickup_stops'])}")
+        print(f"   Departure: {', '.join(r['departure_from_campus'])}")
+    print("-" * 60)
+    search_stop = input("\nSearch routes by your area/stoppage (or press Enter to skip): ").strip()
+    if search_stop:
+        matches = find_routes_by_stop(search_stop)
+        print(f"\nSearch Results for '{search_stop}':")
+        print("-" * 60)
+        if not matches:
+            print("No bus routes found covering this stoppage.")
+        for m in matches:
+            print(f"• {m['route_name']} (Stops: {' ➔ '.join(m['pickup_stops'])})")
+        print("-" * 60)
+
+
 def export_report_menu():
     print_header("EXPORT ACADEMIC SUMMARY REPORT")
     profile = get_profile()
@@ -422,9 +443,10 @@ def main():
         print("9.  Trimester Tuition & 3-Installment Breakdown")
         print("10. CSE Degree Audit Tracker (140 Credits)")
         print("11. Final Exam Target Calculator")
-        print("12. Export Academic Summary Report")
-        print("13. Manage Profile")
-        print("14. Launch Modern Desktop GUI")
+        print("12. UIU Campus Bus & Shuttle Explorer")
+        print("13. Export Academic Summary Report")
+        print("14. Manage Profile")
+        print("15. Launch Modern Desktop GUI")
         print("0.  Exit")
         print()
 
@@ -441,14 +463,15 @@ def main():
             elif choice == "9": tuition_calculator_menu()
             elif choice == "10": degree_audit_menu()
             elif choice == "11": exam_marks_target_menu()
-            elif choice == "12": export_report_menu()
-            elif choice == "13": manage_profile_menu()
-            elif choice == "14": launch_gui()
+            elif choice == "12": bus_routes_menu()
+            elif choice == "13": export_report_menu()
+            elif choice == "14": manage_profile_menu()
+            elif choice == "15": launch_gui()
             elif choice == "0":
                 print("\nThank you for using UIU Student Assistant.")
                 break
             else:
-                print("\nInvalid option. Please select 0-14.")
+                print("\nInvalid option. Please select 0-15.")
         except Exception as error:
             print(f"\nError: {error}")
 

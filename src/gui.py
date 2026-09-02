@@ -11,8 +11,8 @@ from probation import check_probation_status, check_waiver_eligibility
 from tuition import calculate_tuition, calculate_installments
 from courses import get_course_info, normalize_code, check_prerequisites
 from graduation import check_degree_progress, calculate_final_exam_target
+from transport import get_all_routes, find_routes_by_stop
 
-# UIU Official Brand Colors
 UIU_ORANGE = "#F26522"
 UIU_ORANGE_HOVER = "#D9531E"
 UIU_DARK_BG = "#121820"
@@ -27,8 +27,8 @@ class UIUAssistantGUI(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("UIU Student Assistant V2 — Official Edition")
-        self.geometry("1000x700")
-        self.minsize(880, 600)
+        self.geometry("1020x720")
+        self.minsize(900, 620)
         self.configure(fg_color=UIU_DARK_BG)
 
         self.profile = get_profile()
@@ -44,7 +44,6 @@ class UIUAssistantGUI(ctk.CTk):
         self.sidebar.grid(row=0, column=0, sticky="nsew")
         self.sidebar.grid_rowconfigure(7, weight=1)
 
-        # UIU Logo Header Badge
         badge = ctk.CTkLabel(
             self.sidebar,
             text="UIU",
@@ -65,7 +64,6 @@ class UIUAssistantGUI(ctk.CTk):
         )
         subtitle.grid(row=1, column=0, padx=20, pady=(0, 20))
 
-        # Profile Card
         prof_card = ctk.CTkFrame(self.sidebar, fg_color=UIU_CARD_BG, corner_radius=8)
         prof_card.grid(row=2, column=0, padx=15, pady=10, sticky="ew")
 
@@ -105,6 +103,7 @@ class UIUAssistantGUI(ctk.CTk):
         self.tab_exam = self.tabview.add("Final Target")
         self.tab_tuition = self.tabview.add("Tuition & Installments")
         self.tab_degree = self.tabview.add("Degree Audit")
+        self.tab_bus = self.tabview.add("Bus Routes")
         self.tab_courses = self.tabview.add("Prerequisites")
         self.tab_profile = self.tabview.add("Profile")
 
@@ -113,6 +112,7 @@ class UIUAssistantGUI(ctk.CTk):
         self._setup_exam_tab()
         self._setup_tuition_tab()
         self._setup_degree_tab()
+        self._setup_bus_tab()
         self._setup_courses_tab()
         self._setup_profile_tab()
 
@@ -331,7 +331,59 @@ class UIUAssistantGUI(ctk.CTk):
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
-    # --- TAB 6: PREREQUISITES ---
+    # --- TAB 6: BUS ROUTES ---
+    def _setup_bus_tab(self):
+        frame = self.tab_bus
+        ctk.CTkLabel(frame, text="UIU Campus Bus & Shuttle Explorer", font=ctk.CTkFont(size=18, weight="bold"), text_color=UIU_ORANGE).pack(pady=10)
+
+        search_row = ctk.CTkFrame(frame, fg_color="transparent")
+        search_row.pack(fill="x", padx=20, pady=5)
+
+        self.bus_search_entry = ctk.CTkEntry(search_row, placeholder_text="Search by stop or route (e.g. Kazipara, Uttara, Rampura)...", width=380)
+        self.bus_search_entry.pack(side="left", padx=(0, 10))
+
+        ctk.CTkButton(search_row, text="Search", fg_color=UIU_ORANGE, hover_color=UIU_ORANGE_HOVER, width=100, command=self._search_bus).pack(side="left")
+        ctk.CTkButton(search_row, text="View All", fg_color=UIU_CARD_BG, width=100, command=self._show_all_buses).pack(side="left", padx=5)
+
+        self.bus_scroll = ctk.CTkScrollableFrame(frame, height=330, fg_color=UIU_CARD_BG)
+        self.bus_scroll.pack(fill="both", expand=True, padx=20, pady=10)
+
+        self._render_bus_cards(get_all_routes())
+
+    def _render_bus_cards(self, routes):
+        for widget in self.bus_scroll.winfo_children():
+            widget.destroy()
+
+        if not routes:
+            ctk.CTkLabel(self.bus_scroll, text="No routes found matching your query.", text_color=UIU_TEXT_MUTED).pack(pady=20)
+            return
+
+        for r in routes:
+            card = ctk.CTkFrame(self.bus_scroll, fg_color=UIU_SIDEBAR_BG, corner_radius=8)
+            card.pack(fill="x", pady=6, padx=5)
+
+            header = ctk.CTkLabel(card, text=f"🚌 {r['route_name']}", font=ctk.CTkFont(size=14, weight="bold"), text_color=UIU_ORANGE)
+            header.pack(anchor="w", padx=10, pady=(6, 2))
+
+            stops = " ➔ ".join(r["pickup_stops"])
+            ctk.CTkLabel(card, text=f"Stops: {stops}", font=ctk.CTkFont(size=12), wraplength=640, justify="left", text_color="white").pack(anchor="w", padx=10, pady=2)
+
+            dept = ", ".join(r["departure_from_campus"])
+            ctk.CTkLabel(card, text=f"Departure from Campus: {dept}", font=ctk.CTkFont(size=11), text_color=UIU_TEXT_MUTED).pack(anchor="w", padx=10, pady=(2, 6))
+
+    def _search_bus(self):
+        query = self.bus_search_entry.get().strip()
+        if not query:
+            self._render_bus_cards(get_all_routes())
+            return
+        matches = find_routes_by_stop(query)
+        self._render_bus_cards(matches)
+
+    def _show_all_buses(self):
+        self.bus_search_entry.delete(0, "end")
+        self._render_bus_cards(get_all_routes())
+
+    # --- TAB 7: PREREQUISITES ---
     def _setup_courses_tab(self):
         frame = self.tab_courses
         ctk.CTkLabel(frame, text="Prerequisite Eligibility Tester", font=ctk.CTkFont(size=18, weight="bold"), text_color=UIU_ORANGE).pack(pady=10)
@@ -362,7 +414,7 @@ class UIUAssistantGUI(ctk.CTk):
         else:
             self.course_result_lbl.configure(text=f"❌ INELIGIBLE!\nMissing Prerequisites: {', '.join(res['missing'])}", text_color="#E74C3C")
 
-    # --- TAB 7: PROFILE EDIT ---
+    # --- TAB 8: PROFILE EDIT ---
     def _setup_profile_tab(self):
         frame = self.tab_profile
         ctk.CTkLabel(frame, text="Edit Student Profile", font=ctk.CTkFont(size=18, weight="bold"), text_color=UIU_ORANGE).pack(pady=10)
